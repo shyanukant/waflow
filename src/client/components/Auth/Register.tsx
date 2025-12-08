@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
+import { useApiMutation } from '../../hooks/useApiMutation';
 import './Auth.css';
 
 function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [showOtpInput, setShowOtpInput] = useState(false);
     const [otp, setOtp] = useState('');
     const [resendCooldown, setResendCooldown] = useState(0);
@@ -22,99 +21,71 @@ function Register() {
         }
     }, [resendCooldown]);
 
-    const handleSubmit = async (e: any) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+    const { mutate: signUp, isLoading: isSigningUp, error: signUpError } = useApiMutation(
+        async (credentials: any) => {
+            const { data, error } = await supabase.auth.signUp(credentials);
+            if (error) throw error;
+            return data;
+        },
+        {
+            onSuccess: () => {
+                setShowOtpInput(true);
+                setResendCooldown(60);
+            },
+        }
+    );
 
+    const { mutate: verifyOtp, isLoading: isVerifying, error: verifyError } = useApiMutation(
+        async (params: any) => {
+            const { data, error } = await supabase.auth.verifyOtp(params);
+            if (error) throw error;
+            return data;
+        },
+        {
+            onSuccess: () => navigate('/dashboard'),
+        }
+    );
+
+    const { mutate: resendOtp, isLoading: isResending, error: resendError } = useApiMutation(
+        async (params: any) => {
+            const { error } = await supabase.auth.resend(params);
+            if (error) throw error;
+        },
+        {
+            onSuccess: () => setResendCooldown(60),
+        }
+    );
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         if (password.length < 6) {
-            setError('Password must be at least 6 characters');
-            setLoading(false);
+            // This is client-side validation, so we can handle it directly
+            alert('Password must be at least 6 characters');
             return;
         }
-
-        try {
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: fullName,
-                    },
+        await signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName,
                 },
-            });
-
-            if (error) {
-                console.error('Supabase signup error:', error);
-                throw error;
-            }
-
-            console.log('Signup successful:', data);
-
-            // Show OTP input and start cooldown
-            setShowOtpInput(true);
-            setResendCooldown(60);
-            setLoading(false);
-        } catch (err) {
-            console.error('Full error:', err);
-            const error = err as { message?: string };
-            setError(error.message || 'Failed to register');
-            setLoading(false);
-        }
+            },
+        });
     };
 
     const handleResendOtp = async () => {
         if (resendCooldown > 0) return;
-
-        setError('');
-        setLoading(true);
-
-        try {
-            const { error } = await supabase.auth.resend({
-                type: 'signup',
-                email: email,
-            });
-
-            if (error) throw error;
-
-            setResendCooldown(60);
-            setError(''); // Clear any errors
-        } catch (err) {
-            console.error('Resend error:', err);
-            const error = err as { message?: string };
-            setError(error.message || 'Failed to resend code');
-        } finally {
-            setLoading(false);
-        }
+        await resendOtp({ type: 'signup', email });
     };
 
-    const handleVerifyOtp = async (e: any) => {
+    const handleVerifyOtp = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        try {
-            const { data, error } = await supabase.auth.verifyOtp({
-                email,
-                token: otp,
-                type: 'email'
-            });
-
-            if (error) {
-                console.error('OTP verification error:', error);
-                throw error;
-            }
-
-            console.log('OTP verified successfully:', data);
-            navigate('/dashboard');
-        } catch (err) {
-            console.error('Full error:', err);
-            const error = err as { message?: string };
-            setError(error.message || 'Invalid OTP');
-        } finally {
-            setLoading(false);
-        }
+        await verifyOtp({ email, token: otp, type: 'email' });
     };
+
+    const error = signUpError || verifyError || resendError;
+    const loading = isSigningUp || isVerifying || isResending;
 
     // Show OTP verification form
     if (showOtpInput) {
@@ -130,7 +101,7 @@ function Register() {
 
                     {error && (
                         <div className="error-message">
-                            {error}
+                            {error.message}
                         </div>
                     )}
 
@@ -208,7 +179,7 @@ function Register() {
 
                 {error && (
                     <div className="error-message">
-                        {error}
+                        {error.message}
                     </div>
                 )}
 

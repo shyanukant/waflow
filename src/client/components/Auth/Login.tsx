@@ -1,34 +1,28 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
+import { useApiMutation } from '../../hooks/useApiMutation';
 import './Auth.css';
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
+    const { mutate: login, isLoading, error } = useApiMutation(
+        async (credentials: { email: string, password: string }) => {
+            const { data, error } = await supabase.auth.signInWithPassword(credentials);
             if (error) throw error;
-
-            navigate('/dashboard');
-        } catch (error) {
-            setError(error.message || 'Failed to login');
-        } finally {
-            setLoading(false);
+            return data;
+        },
+        {
+            onSuccess: () => navigate('/dashboard'),
         }
+    );
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await login({ email, password });
     };
 
     return (
@@ -41,7 +35,7 @@ function Login() {
 
                 {error && (
                     <div className="error-message">
-                        {error}
+                        {error.message}
                     </div>
                 )}
 
@@ -76,8 +70,8 @@ function Login() {
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? (
+                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                        {isLoading ? (
                             <span className="spinner-small"></span>
                         ) : (
                             'Sign In'

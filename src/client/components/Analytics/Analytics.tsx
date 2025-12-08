@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
+import { formatDate } from '../../utils/formatters';
+import PageLoader from '../common/PageLoader';
 import './Analytics.css';
 
 interface AnalyticsData {
@@ -48,16 +50,6 @@ function Analytics() {
         }
     };
 
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleString('en-IN', {
-            day: 'numeric',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
     const formatPhone = (phone: string) => {
         // Mask middle digits for privacy
         if (phone.length > 6) {
@@ -67,13 +59,7 @@ function Analytics() {
     };
 
     if (loading) {
-        return (
-            <div className="analytics-container">
-                <div className="container" style={{ display: 'flex', justifyContent: 'center', paddingTop: '100px' }}>
-                    <div className="spinner"></div>
-                </div>
-            </div>
-        );
+        return <PageLoader />;
     }
 
     return (

@@ -12,6 +12,7 @@ import QRScanner from './components/WhatsApp/QRScanner';
 import AgentCreator from './components/Agents/AgentCreator';
 import Analytics from './components/Analytics/Analytics';
 import Leads from './components/Leads/Leads';
+import PageLoader from './components/common/PageLoader';
 
 function App() {
     const [session, setSession] = useState<Session | null>(null);
@@ -31,11 +32,7 @@ function App() {
     }, []);
 
     if (loading) {
-        return (
-            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="spinner"></div>
-            </div>
-        );
+        return <PageLoader />;
     }
 
     return (

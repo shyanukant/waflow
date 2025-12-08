@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getSocket } from '../../services/socket';
 import api from '../../services/api';
+import PageLoader from '../common/PageLoader';
+import KnowledgeUploader from '../Knowledge/KnowledgeUploader';
 import './Onboarding.css';
 
 type Step = 'whatsapp' | 'knowledge' | 'agent' | 'activate';
@@ -24,8 +26,6 @@ function Onboarding() {
 
     // Knowledge state
     const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
-    const [uploading, setUploading] = useState(false);
-    const [urlInput, setUrlInput] = useState('');
 
     // Agent state
     const [agentId, setAgentId] = useState<string | null>(null);
@@ -147,46 +147,6 @@ function Onboarding() {
         };
     }, [sessionId]);
 
-    // File upload
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setUploading(true);
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            await api.post('/knowledge/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            await refreshKnowledge();
-        } catch (error) {
-            console.error('Error uploading:', error);
-            alert('Failed to upload file');
-        } finally {
-            setUploading(false);
-            e.target.value = '';
-        }
-    };
-
-    // URL add
-    const handleAddUrl = async () => {
-        if (!urlInput.trim()) return;
-
-        setUploading(true);
-        try {
-            await api.post('/knowledge/scrape', { url: urlInput });
-            await refreshKnowledge();
-            setUrlInput('');
-        } catch (error) {
-            console.error('Error scraping:', error);
-            alert('Failed to add URL');
-        } finally {
-            setUploading(false);
-        }
-    };
-
     // Toggle knowledge selection
     const toggleKnowledge = (id: string) => {
         setKnowledgeBaseIds(prev =>
@@ -232,12 +192,11 @@ function Onboarding() {
         }
     };
 
+
+    // ... (rest of the component)
+
     if (loading) {
-        return (
-            <div className="onboarding">
-                <div className="onboarding-loader"><div className="spinner"></div></div>
-            </div>
-        );
+        return <PageLoader />;
     }
 
     return (
@@ -304,46 +263,13 @@ function Onboarding() {
                             )}
                         </div>
                     )}
-
                     {/* Step 2: Knowledge Base */}
                     {currentStep === 'knowledge' && (
                         <div className="step-content fade-in">
                             <h2>📚 Add Knowledge Base</h2>
                             <p>Upload files or add URLs for your AI to learn from.</p>
 
-                            <div className="upload-section">
-                                <div className="upload-box">
-                                    <label className="upload-label">
-                                        <input
-                                            type="file"
-                                            accept=".pdf,.txt,.doc,.docx"
-                                            onChange={handleFileUpload}
-                                            disabled={uploading}
-                                        />
-                                        <span className="upload-icon">📄</span>
-                                        <span>{uploading ? 'Uploading...' : 'Upload File'}</span>
-                                        <span className="upload-hint">PDF, TXT, DOC</span>
-                                    </label>
-                                </div>
-
-                                <div className="url-box">
-                                    <input
-                                        type="url"
-                                        className="input"
-                                        placeholder="https://yourwebsite.com"
-                                        value={urlInput}
-                                        onChange={(e) => setUrlInput(e.target.value)}
-                                        disabled={uploading}
-                                    />
-                                    <button
-                                        className="btn btn-secondary"
-                                        onClick={handleAddUrl}
-                                        disabled={!urlInput.trim() || uploading}
-                                    >
-                                        Add URL
-                                    </button>
-                                </div>
-                            </div>
+                            <KnowledgeUploader onUploadComplete={refreshKnowledge} />
 
                             {knowledgeItems.length > 0 && (
                                 <div className="knowledge-list">
