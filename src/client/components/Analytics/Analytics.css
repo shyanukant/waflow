@@ -1,0 +1,200 @@
+.analytics-container {
+    min-height: 100vh;
+    background: var(--color-bg);
+    padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.page-title svg {
+    color: var(--color-primary);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 900px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon.today {
+    background: rgba(37, 211, 102, 0.15);
+    color: var(--color-primary);
+}
+
+.stat-icon.yesterday {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3B82F6;
+}
+
+.stat-icon.week {
+    background: rgba(168, 85, 247, 0.15);
+    color: #A855F7;
+}
+
+.stat-icon.month {
+    background: rgba(249, 115, 22, 0.15);
+    color: #F97316;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+/* Summary Row */
+.summary-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 500px) {
+    .summary-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.summary-card {
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.summary-value {
+    display: block;
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.summary-label {
+    color: var(--color-text-muted);
+}
+
+/* Conversations */
+.conversations-section {
+    padding: var(--spacing-xl);
+}
+
+.section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-primary);
+}
+
+.conversations-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.conversation-item {
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+}
+
+.convo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+.convo-phone {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-weight: 500;
+}
+
+.convo-phone svg {
+    color: var(--color-primary);
+}
+
+.convo-time {
+    color: var(--color-text-muted);
+}
+
+.convo-messages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.message {
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+}
+
+.message-label {
+    font-weight: 600;
+    margin-right: var(--spacing-xs);
+}
+
+.user-message {
+    background: rgba(37, 211, 102, 0.1);
+}
+
+.agent-message {
+    background: var(--color-surface);
+}
+
+.empty-state {
+    color: var(--color-text-muted);
+    text-align: center;
+    padding: var(--spacing-xl);
+}
