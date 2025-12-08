@@ -12,6 +12,7 @@ import whatsappRoutes from './routes/whatsapp.js';
 import knowledgeRoutes from './routes/knowledge.js';
 import agentRoutes from './routes/agents.js';
 import analyticsRoutes from './routes/analytics.js';
+import leadsRoutes from './routes/leads.js';
 
 // Import middleware
 import { authenticateUser } from './middleware/auth.js';
@@ -59,6 +60,7 @@ app.use('/api/whatsapp', authenticateUser, whatsappRoutes);
 app.use('/api/knowledge', authenticateUser, knowledgeRoutes);
 app.use('/api/agents', authenticateUser, agentRoutes);
 app.use('/api/analytics', authenticateUser, analyticsRoutes);
+app.use('/api/leads', authenticateUser, leadsRoutes);
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {

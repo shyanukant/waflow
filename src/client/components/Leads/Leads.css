@@ -1,0 +1,213 @@
+.leads-container {
+    min-height: 100vh;
+    background: var(--color-bg);
+    padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.page-title svg {
+    color: var(--color-primary);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl);
+}
+
+.empty-state svg {
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.empty-state h3 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.empty-state p {
+    color: var(--color-text-muted);
+}
+
+/* Leads Grid */
+.leads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.lead-card {
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.lead-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.lead-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.lead-phone {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-weight: 600;
+}
+
+.lead-phone svg {
+    color: var(--color-primary);
+}
+
+.lead-status {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-new {
+    background: rgba(37, 211, 102, 0.2);
+    color: var(--color-primary);
+}
+
+.status-contacted {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3B82F6;
+}
+
+.status-converted {
+    background: rgba(168, 85, 247, 0.2);
+    color: #A855F7;
+}
+
+.status-closed {
+    background: rgba(107, 114, 128, 0.2);
+    color: #6B7280;
+}
+
+.lead-name {
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+}
+
+.lead-email {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.lead-interest {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin-bottom: var(--spacing-md);
+    line-height: 1.4;
+}
+
+.lead-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border);
+}
+
+.lead-date {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+}
+
+.status-select {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    color: var(--color-text);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--spacing-lg);
+}
+
+.modal {
+    max-width: 500px;
+    width: 100%;
+    padding: var(--spacing-xl);
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-close {
+    position: absolute;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: var(--color-text);
+}
+
+.modal h2 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.detail-section p {
+    background: var(--color-bg-secondary);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    line-height: 1.5;
+}
+
+.label {
+    color: var(--color-text-muted);
+    font-weight: 500;
+}

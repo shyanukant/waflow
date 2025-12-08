@@ -57,12 +57,32 @@ export const conversations = pgTable('conversations', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Leads table - captures interested users from WhatsApp
+export const leads = pgTable('leads', {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    agentId: uuid('agent_id').references(() => agents.id, { onDelete: 'set null' }),
+    // Contact info
+    phoneNumber: text('phone_number').notNull(),
+    name: text('name'),
+    email: text('email'),
+    // Lead details
+    interest: text('interest'), // What they're interested in
+    source: text('source').default('whatsapp').notNull(), // How they came
+    status: text('status').default('new').notNull(), // new, contacted, converted, closed
+    notes: text('notes'), // Additional notes from conversation
+    // Timestamps
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
     whatsappSessions: many(whatsappSessions),
     knowledgeItems: many(knowledgeItems),
     agents: many(agents),
     conversations: many(conversations),
+    leads: many(leads),
 }));
 
 export const whatsappSessionsRelations = relations(whatsappSessions, ({ one, many }) => ({
@@ -114,3 +134,5 @@ export type Agent = typeof agents.$inferSelect;
 export type NewAgent = typeof agents.$inferInsert;
 export type Conversation = typeof conversations.$inferSelect;
 export type NewConversation = typeof conversations.$inferInsert;
+export type Lead = typeof leads.$inferSelect;
+export type NewLead = typeof leads.$inferInsert;

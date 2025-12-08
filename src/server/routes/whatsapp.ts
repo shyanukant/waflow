@@ -65,6 +65,27 @@ router.post('/connect', async (req: AuthRequest, res: Response) => {
 });
 
 /**
+ * GET /api/whatsapp/session
+ * Get current WhatsApp session for user (single session)
+ */
+router.get('/session', async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.user!.id;
+
+        // Get the most recent session for this user
+        const session = await db.query.whatsappSessions.findFirst({
+            where: eq(whatsappSessions.userId, userId),
+            orderBy: (sessions, { desc }) => [desc(sessions.createdAt)]
+        });
+
+        res.json({ session: session || null });
+    } catch (error: any) {
+        console.error('Error getting session:', error);
+        res.status(500).json({ error: 'Failed to get session', session: null });
+    }
+});
+
+/**
  * GET /api/whatsapp/status/:sessionId
  * Get WhatsApp session status
  */
