@@ -12,6 +12,7 @@ import QRScanner from './components/WhatsApp/QRScanner';
 import AgentCreator from './components/Agents/AgentCreator';
 import Analytics from './components/Analytics/Analytics';
 import Leads from './components/Leads/Leads';
+import Landing from './components/Landing/Landing';
 import PageLoader from './components/common/PageLoader';
 
 function App() {
@@ -38,6 +39,9 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
+                {/* Public Landing Page */}
+                <Route path="/" element={session ? <Navigate to="/dashboard" /> : <Landing />} />
+
                 {/* Auth */}
                 <Route path="/login" element={session ? <Navigate to="/onboarding" /> : <Login />} />
                 <Route path="/register" element={session ? <Navigate to="/onboarding" /> : <Register />} />
@@ -52,9 +56,8 @@ function App() {
                 <Route path="/analytics" element={session ? <Analytics /> : <Navigate to="/login" />} />
                 <Route path="/leads" element={session ? <Leads /> : <Navigate to="/login" />} />
 
-                {/* Default: go to onboarding (it will redirect to dashboard if setup done) */}
-                <Route path="/" element={<Navigate to={session ? "/onboarding" : "/login"} />} />
-                <Route path="*" element={<Navigate to={session ? "/onboarding" : "/login"} />} />
+                {/* Catch all */}
+                <Route path="*" element={<Navigate to={session ? "/dashboard" : "/"} />} />
 
             </Routes>
         </BrowserRouter>
