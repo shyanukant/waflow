@@ -44,7 +44,7 @@ export const authenticateUser = async (
         }
 
         // Ensure user exists in our database
-        await getOrCreateUser(user.id);
+        await getOrCreateUser(user.id, user.email);
 
         // Attach user to request object
         req.user = {
@@ -62,7 +62,7 @@ export const authenticateUser = async (
 /**
  * Get or create user in our database
  */
-export const getOrCreateUser = async (userId: string) => {
+export const getOrCreateUser = async (userId: string, email?: string) => {
     try {
         // Check if user exists
         const existingUser = await db.query.users.findFirst({
@@ -73,9 +73,12 @@ export const getOrCreateUser = async (userId: string) => {
             return existingUser;
         }
 
-        // Create new user
+        // Create new user with email
         const [newUser] = await db.insert(users)
-            .values({ id: userId })
+            .values({
+                id: userId,
+                email: email || `${userId}@placeholder.com`
+            })
             .returning();
 
         return newUser;
