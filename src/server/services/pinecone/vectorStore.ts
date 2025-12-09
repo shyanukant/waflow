@@ -131,14 +131,36 @@ export const searchKnowledge = async (
             filter,
         });
 
+        // Debug: log raw results structure
+        if (results.matches.length > 0) {
+            console.log(`🔍 Pinecone returned ${results.matches.length} matches`);
+            const sample = results.matches[0];
+            console.log(`   Sample match keys:`, Object.keys(sample));
+            console.log(`   Sample metadata keys:`, sample.metadata ? Object.keys(sample.metadata) : 'none');
+        }
+
         return {
             success: true,
-            results: results.matches.map(match => ({
-                id: match.id,
-                score: match.score,
-                content: match.metadata?.text ?? match.metadata?.content,
-                metadata: match.metadata,
-            })),
+            results: results.matches.map(match => {
+                // Try multiple possible locations for the text content
+                const content =
+                    (match as any).text ||  // Integrated embeddings may return text at top level
+                    match.metadata?.text ||
+                    match.metadata?.content ||
+                    match.metadata?.chunk_text ||
+                    '';
+
+                if (!content && match.metadata) {
+                    console.log(`⚠️ Match ${match.id} has no content. Metadata:`, JSON.stringify(match.metadata).slice(0, 200));
+                }
+
+                return {
+                    id: match.id,
+                    score: match.score,
+                    content,
+                    metadata: match.metadata,
+                };
+            }),
         };
     } catch (error: any) {
         console.error('Error searching Pinecone:', error);

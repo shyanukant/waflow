@@ -24,19 +24,42 @@ interface LeadState {
 }
 const leadStates: Map<string, LeadState> = new Map();
 
-// High-intent keywords that trigger email request
-const EMAIL_TRIGGERS = [
-    'book', 'booking', 'quote', 'callback', 'call back', 'call me',
-    'project', 'meeting', 'schedule', 'details', 'proposal',
-    'team', 'discuss', 'consultation', 'demo'
+// High-intent keywords that trigger email/name request
+const LEAD_CAPTURE_TRIGGERS = [
+    // Booking & Scheduling
+    'book', 'booking', 'appointment', 'schedule', 'meeting', 'call me', 'callback', 'call back',
+    // Purchase Intent
+    'buy', 'purchase', 'order', 'pricing', 'price', 'cost', 'rate', 'quote', 'quotation',
+    // Services & Products
+    'service', 'product', 'package', 'plan', 'offer', 'deal',
+    // Information & Contact
+    'details', 'more info', 'more information', 'brochure', 'catalog', 'catalogue',
+    'contact', 'reach out', 'get in touch', 'speak to', 'talk to',
+    // Project & Business
+    'project', 'proposal', 'consultation', 'consult', 'demo', 'trial', 'free trial',
+    'partnership', 'collaborate', 'work together', 'hire', 'hiring',
+    // Interest signals
+    'interested', 'want to know', 'tell me about', 'how much', 'what is the'
+];
+
+// Keywords that indicate user needs info we might not have
+const DETAILED_INFO_TRIGGERS = [
+    'specific', 'exactly', 'detailed', 'full details', 'complete',
+    'technical', 'specifications', 'custom', 'customize', 'customise',
+    'timeline', 'deadline', 'delivery', 'availability'
 ];
 
 /**
  * Check if message has high-intent triggers
  */
-const hasEmailTrigger = (message: string): boolean => {
+const hasLeadCaptureTrigger = (message: string): boolean => {
     const lower = message.toLowerCase();
-    return EMAIL_TRIGGERS.some(t => lower.includes(t));
+    return LEAD_CAPTURE_TRIGGERS.some(t => lower.includes(t));
+};
+
+const needsDetailedInfo = (message: string): boolean => {
+    const lower = message.toLowerCase();
+    return DETAILED_INFO_TRIGGERS.some(t => lower.includes(t));
 };
 
 /**
@@ -176,9 +199,19 @@ export const handleIncomingMessage = async (
         if (!state.hasName && !state.askedForName) {
             leadContext += '\n- You can ask for name naturally';
         }
-        if (!state.hasEmail && hasEmailTrigger(messageText) && !state.askedForEmail) {
-            leadContext += '\n- User wants booking/details - ask for email';
+        // Check for lead capture triggers
+        const wantsLeadCapture = hasLeadCaptureTrigger(messageText);
+        const wantsDetails = needsDetailedInfo(messageText);
+
+        if (!state.hasEmail && (wantsLeadCapture || wantsDetails) && !state.askedForEmail) {
+            leadContext += '\n- User wants booking/service/details - ASK FOR EMAIL to send info or follow up';
             state.askedForEmail = true;
+            leadStates.set(senderNumber, state);
+        }
+
+        if (!state.hasName && wantsLeadCapture && !state.askedForName) {
+            leadContext += '\n- User shows high interest - ASK FOR NAME naturally';
+            state.askedForName = true;
             leadStates.set(senderNumber, state);
         }
 
