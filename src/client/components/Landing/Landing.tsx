@@ -53,7 +53,7 @@ function Landing() {
             <nav className="landing-nav">
                 <div className="nav-container">
                     <div className="nav-logo">
-                        <span className="logo-icon">💬</span>
+                        <img src="/logo.png" alt="WAFlow" className="logo-img" />
                         <span className="logo-text">WAFlow</span>
                     </div>
                     <div className="nav-links">
@@ -329,7 +329,7 @@ function Landing() {
                 <div className="footer-container">
                     <div className="footer-brand">
                         <div className="nav-logo">
-                            <span className="logo-icon">💬</span>
+                            <img src="/logo.png" alt="WAFlow" className="logo-img" />
                             <span className="logo-text">WAFlow</span>
                         </div>
                         <p>AI-powered WhatsApp automation for modern businesses.</p>

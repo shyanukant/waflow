@@ -188,8 +188,8 @@ function Dashboard() {
                 <div className="header-content">
                     <div className="header-left">
                         <h1 className="logo">
-                            <span className="logo-icon">⚡</span>
-                            WaFlow
+                            <img src="/logo.png" alt="WAFlow" className="logo-img" />
+                            WAFlow
                         </h1>
                     </div>
                     <div className="header-right">

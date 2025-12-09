@@ -8,6 +8,7 @@ function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [showOtpInput, setShowOtpInput] = useState(false);
     const [otp, setOtp] = useState('');
     const [resendCooldown, setResendCooldown] = useState(0);
@@ -173,6 +174,7 @@ function Register() {
         <div className="auth-container">
             <div className="auth-card glass fade-in">
                 <div className="auth-header">
+                    <img src="/logo.png" alt="WAFlow" className="auth-logo" />
                     <h1 className="auth-title">Create Account</h1>
                     <p className="auth-subtitle">Get started with WAFlow</p>
                 </div>
@@ -218,16 +220,26 @@ function Register() {
                         <label className="label" htmlFor="password">
                             Password
                         </label>
-                        <input
-                            id="password"
-                            type="password"
-                            className="input"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                        <small style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-xs)' }}>
+                        <div className="password-input-wrapper">
+                            <input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                className="input"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                                {showPassword ? '🙈' : '👁️'}
+                            </button>
+                        </div>
+                        <small style={{ color: '#9ca3af', fontSize: '0.75rem' }}>
                             Minimum 6 characters
                         </small>
                     </div>
