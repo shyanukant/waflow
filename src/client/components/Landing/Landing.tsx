@@ -104,7 +104,7 @@ function Landing() {
                             Start Free Trial
                             <span className="btn-arrow">→</span>
                         </Link>
-                        <a href="#how-it-works" className="btn-secondary-large">
+                        <a href="https://youtu.be/-anZcc3O_MQ" target="_blank" rel="noopener noreferrer" className="btn-secondary-large">
                             <span className="play-icon">▶</span>
                             Watch Demo
                         </a>
