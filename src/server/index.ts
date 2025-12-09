@@ -86,8 +86,9 @@ if (isDev) {
         }
     })();
 } else {
-    // Production: Serve static files
-    const publicPath = path.join(__dirname, '../../public');
+    // Production: Serve static files from dist/public
+    // When running from dist/server/index.js, public is at ../public
+    const publicPath = path.join(__dirname, '../public');
     app.use(express.static(publicPath));
 
     app.get('*', (req: Request, res: Response) => {
