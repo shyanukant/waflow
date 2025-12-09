@@ -308,6 +308,10 @@ function Dashboard() {
                     </section>
                 </div>
             </main>
+
+            <footer className="dashboard-footer">
+                Created by <a href="https://krtrim.tech" target="_blank" rel="noopener noreferrer">krtrim</a>
+            </footer>
         </div>
     );
 }
