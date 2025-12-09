@@ -3,12 +3,19 @@
 /**
  * Auto-generate VITE_ prefixed env vars from existing vars
  * This runs before dev/build to avoid manual duplication in .env
+ * In production (Render), env vars come from dashboard so we skip this
  */
 
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const envPath = join(process.cwd(), '.env');
+
+// Skip if .env doesn't exist (production environment)
+if (!existsSync(envPath)) {
+    console.log('ℹ️  No .env file found - using environment variables from hosting provider');
+    process.exit(0);
+}
 
 // Read .env file
 let envContent = readFileSync(envPath, 'utf-8');
@@ -46,3 +53,4 @@ if (viteVars.length > 0) {
 } else {
     console.log('⚠️  No environment variables found to expose');
 }
+
