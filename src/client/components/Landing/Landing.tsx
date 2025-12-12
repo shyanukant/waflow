@@ -333,6 +333,7 @@ function Landing() {
                             <span className="logo-text">WAFlow</span>
                         </div>
                         <p>AI-powered WhatsApp automation for modern businesses.</p>
+                        <a href="https://www.producthunt.com/products/waflow-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-waflow&#0045;2" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1049405&theme=light&t=1765532361907" alt="WAFlow - Whatsapp&#0032;automation&#0032;agents | Product Hunt" style={{width: '250px', height: '54px'}} width="250" height="54" /></a>
                     </div>
 
                     <div className="footer-links">
