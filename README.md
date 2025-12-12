@@ -1,7 +1,7 @@
 # WAFlow
 
 AI-powered WhatsApp Automation Agent Platform - Create intelligent chatbots with custom knowledge bases.
-
+[![Sponsor](https://img.shields.io/badge/💖%20Sponsor-Support%20My%20Work-ff69b4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/shyanukant)
 ## 🎬 Demo Video
 
 [![WAFlow Demo](https://img.youtube.com/vi/-anZcc3O_MQ/maxresdefault.jpg)](https://youtu.be/-anZcc3O_MQ)
