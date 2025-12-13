@@ -248,7 +248,9 @@ export class SessionManager {
         metadata: any = {}
     ) {
         try {
-            await db.insert(whatsappSessions)
+            console.log(`📝 Updating session status: ${sessionId} -> ${status}`);
+
+            const result = await db.insert(whatsappSessions)
                 .values({
                     sessionId,
                     userId,
@@ -263,9 +265,21 @@ export class SessionManager {
                         metadata,
                         updatedAt: new Date()
                     }
-                });
+                })
+                .returning();
+
+            console.log(`✅ Session status updated: ${sessionId} = ${status}`, result.length > 0 ? 'inserted/updated' : 'no change');
         } catch (error) {
-            console.error('Error updating session status:', error);
+            console.error('❌ Error updating session status:', error);
+            // Try direct update as fallback
+            try {
+                await db.update(whatsappSessions)
+                    .set({ status, metadata, updatedAt: new Date() })
+                    .where(eq(whatsappSessions.sessionId, sessionId));
+                console.log(`✅ Session status updated via fallback: ${sessionId} = ${status}`);
+            } catch (fallbackError) {
+                console.error('❌ Fallback update also failed:', fallbackError);
+            }
         }
     }
 
