@@ -377,8 +377,8 @@ You: "[Ideal response]"`}</pre>
             </main>
 
             <footer className="docs-footer">
-                <p>Need help? <a href="mailto:support@waflow.com">Contact Support</a></p>
-                <p>For detailed documentation, visit our <a href="https://github.com/yourusername/waflow/wiki" target="_blank" rel="noopener noreferrer">GitHub Wiki</a></p>
+                <p>Need help? <a href="mailto:contact@krtrim.com">Contact Support</a></p>
+                <p>For detailed documentation, visit our <a href="https://github.com/shyanukant/waflow/wiki/Documentation#waflow-documentation" target="_blank" rel="noopener noreferrer">GitHub Wiki</a></p>
             </footer>
         </div>
     );

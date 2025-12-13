@@ -1,6 +1,6 @@
-// Settings Page - Trial status and WhatsApp API key management
+// Settings Page - Trial status, WhatsApp API key, and Calendar management
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import './Settings.css';
 
@@ -25,6 +25,7 @@ interface Provider {
 }
 
 function Settings() {
+    const [searchParams] = useSearchParams();
     const [trialStatus, setTrialStatus] = useState<TrialStatus | null>(null);
     const [providers, setProviders] = useState<Provider[]>([]);
     const [selectedProvider, setSelectedProvider] = useState<string>('');
@@ -34,16 +35,33 @@ function Settings() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+    // Calendar state
+    const [calendarConnected, setCalendarConnected] = useState(false);
+    const [calendarLoading, setCalendarLoading] = useState(false);
+
+    // Check for calendar callback
+    useEffect(() => {
+        const calendarStatus = searchParams.get('calendar');
+        if (calendarStatus === 'connected') {
+            setMessage({ type: 'success', text: '✅ Google Calendar connected successfully!' });
+            setCalendarConnected(true);
+        } else if (calendarStatus === 'error') {
+            setMessage({ type: 'error', text: 'Failed to connect Google Calendar. Please try again.' });
+        }
+    }, [searchParams]);
+
     // Fetch trial status and providers
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [trialRes, providersRes] = await Promise.all([
+                const [trialRes, providersRes, calendarRes] = await Promise.all([
                     api.get('/settings/trial'),
                     api.get('/settings/providers'),
+                    api.get('/calendar/status').catch(() => ({ data: { connected: false } })),
                 ]);
                 setTrialStatus(trialRes.data);
                 setProviders(providersRes.data);
+                setCalendarConnected(calendarRes.data.connected);
             } catch (error) {
                 console.error('Failed to fetch settings:', error);
             } finally {
@@ -77,7 +95,6 @@ function Settings() {
                 phoneNumberId: selectedProvider === 'meta' ? phoneNumberId : undefined,
             });
             setMessage({ type: 'success', text: 'API settings saved successfully!' });
-            // Refresh trial status
             const res = await api.get('/settings/trial');
             setTrialStatus(res.data);
         } catch (error: any) {
@@ -104,6 +121,35 @@ function Settings() {
         }
     };
 
+    const handleConnectCalendar = async () => {
+        setCalendarLoading(true);
+        try {
+            const res = await api.get('/calendar/connect');
+            if (res.data.authUrl) {
+                window.location.href = res.data.authUrl;
+            } else {
+                setMessage({ type: 'error', text: 'Failed to get calendar authorization URL' });
+            }
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.response?.data?.message || 'Calendar integration not configured. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.' });
+        } finally {
+            setCalendarLoading(false);
+        }
+    };
+
+    const handleDisconnectCalendar = async () => {
+        if (!confirm('Disconnect Google Calendar? Meeting scheduling will stop working.')) {
+            return;
+        }
+        try {
+            await api.delete('/calendar/disconnect');
+            setCalendarConnected(false);
+            setMessage({ type: 'success', text: 'Google Calendar disconnected.' });
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Failed to disconnect calendar' });
+        }
+    };
+
     if (loading) {
         return (
             <div className="settings-page">
@@ -112,15 +158,19 @@ function Settings() {
         );
     }
 
-    const selectedProviderData = providers.find(p => p.id === selectedProvider);
-
     return (
         <div className="settings-page">
             <div className="settings-header">
                 <Link to="/dashboard" className="back-link">← Back to Dashboard</Link>
-                <h1>WhatsApp Settings</h1>
-                <p>Configure your WhatsApp connection method</p>
+                <h1>⚙️ Settings</h1>
+                <p>Configure WhatsApp connection and integrations</p>
             </div>
+
+            {message && (
+                <div className={`message ${message.type}`}>
+                    {message.text}
+                </div>
+            )}
 
             {/* Trial Status Card */}
             <div className={`trial-card ${trialStatus?.isTrialExpired ? 'expired' : ''}`}>
@@ -158,9 +208,52 @@ function Settings() {
                 </div>
             </div>
 
+            {/* Google Calendar Integration */}
+            <div className="settings-section">
+                <h2>📅 Google Calendar</h2>
+                <p className="section-description">
+                    Connect your Google Calendar for AI-powered meeting scheduling and reminders.
+                </p>
+
+                <div className="calendar-card">
+                    <div className="calendar-status">
+                        <div className={`status-indicator ${calendarConnected ? 'connected' : 'disconnected'}`}>
+                            {calendarConnected ? '✓' : '○'}
+                        </div>
+                        <div className="status-info">
+                            <h4>{calendarConnected ? 'Calendar Connected' : 'Not Connected'}</h4>
+                            <p>
+                                {calendarConnected
+                                    ? 'AI can schedule meetings and send calendar invites.'
+                                    : 'Connect to enable meeting scheduling via WhatsApp.'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {calendarConnected ? (
+                        <button className="btn btn-secondary" onClick={handleDisconnectCalendar}>
+                            Disconnect Calendar
+                        </button>
+                    ) : (
+                        <button className="btn btn-primary" onClick={handleConnectCalendar} disabled={calendarLoading}>
+                            {calendarLoading ? 'Connecting...' : '🔗 Connect Google Calendar'}
+                        </button>
+                    )}
+                </div>
+
+                <div className="calendar-features">
+                    <h4>What your AI can do:</h4>
+                    <ul>
+                        <li>📅 <strong>Schedule meetings</strong> - "Book a demo for tomorrow at 2pm"</li>
+                        <li>⏰ <strong>Set reminders</strong> - "Remind me about this quote"</li>
+                        <li>🔄 <strong>Auto follow-ups</strong> - Send reminders for scheduled calls</li>
+                    </ul>
+                </div>
+            </div>
+
             {/* Connection Mode Selection */}
             <div className="settings-section">
-                <h2>Connection Mode</h2>
+                <h2>📱 WhatsApp Connection Mode</h2>
                 <div className="mode-cards">
                     <div
                         className={`mode-card ${trialStatus?.connectionMode === 'trial' ? 'active' : ''} ${trialStatus?.isTrialExpired ? 'disabled' : ''}`}
@@ -183,16 +276,10 @@ function Settings() {
 
             {/* API Key Form */}
             <div className="settings-section">
-                <h2>WhatsApp Business API</h2>
+                <h2>🔑 WhatsApp Business API</h2>
                 <p className="section-description">
                     Enter your API credentials from one of the supported providers.
                 </p>
-
-                {message && (
-                    <div className={`message ${message.type}`}>
-                        {message.text}
-                    </div>
-                )}
 
                 <form onSubmit={handleSaveApiKey} className="api-form">
                     <div className="form-group">
@@ -210,12 +297,8 @@ function Settings() {
                                     </div>
                                     <p>{provider.description}</p>
                                     <div className="provider-links">
-                                        <a href={provider.docsUrl} target="_blank" rel="noopener noreferrer">
-                                            📚 Documentation
-                                        </a>
-                                        <a href={provider.setupUrl} target="_blank" rel="noopener noreferrer">
-                                            ⚙️ Get API Key
-                                        </a>
+                                        <a href={provider.docsUrl} target="_blank" rel="noopener noreferrer">📚 Docs</a>
+                                        <a href={provider.setupUrl} target="_blank" rel="noopener noreferrer">⚙️ Get Key</a>
                                     </div>
                                 </div>
                             ))}
@@ -248,7 +331,7 @@ function Settings() {
                                         required
                                     />
                                     <small>
-                                        Find this in your <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener noreferrer">Meta App Dashboard</a> → WhatsApp → API Setup
+                                        Find this in your <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener noreferrer">Meta App Dashboard</a>
                                     </small>
                                 </div>
                             )}

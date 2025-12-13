@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../services/api';
 
 interface KnowledgeUploaderProps {
     onUploadComplete: () => void;
+    onUploadStateChange?: (isUploading: boolean) => void;
 }
 
-const KnowledgeUploader: React.FC<KnowledgeUploaderProps> = ({ onUploadComplete }) => {
+const KnowledgeUploader: React.FC<KnowledgeUploaderProps> = ({ onUploadComplete, onUploadStateChange }) => {
     const [uploading, setUploading] = useState(false);
     const [url, setUrl] = useState('');
+
+    // Notify parent when upload state changes
+    useEffect(() => {
+        onUploadStateChange?.(uploading);
+    }, [uploading, onUploadStateChange]);
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

@@ -6,13 +6,21 @@ import PageLoader from '../common/PageLoader';
 import KnowledgeUploader from '../Knowledge/KnowledgeUploader';
 import './Onboarding.css';
 
-type Step = 'whatsapp' | 'knowledge' | 'agent' | 'activate';
+// Simplified to 3 steps: WhatsApp → Agent (with Knowledge) → Go Live
+type Step = 'whatsapp' | 'agent' | 'activate';
 
 interface KnowledgeItem {
     id: string;
     source_type: string;
     metadata: Record<string, any>;
 }
+
+// Personas for selection
+const PERSONAS = [
+    { id: 'professional', name: 'Professional', emoji: '💼' },
+    { id: 'friendly', name: 'Friendly', emoji: '😊' },
+    { id: 'casual', name: 'Casual', emoji: '🎉' },
+];
 
 function Onboarding() {
     const navigate = useNavigate();
@@ -26,11 +34,13 @@ function Onboarding() {
 
     // Knowledge state
     const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Agent state
     const [agentId, setAgentId] = useState<string | null>(null);
     const [agentName, setAgentName] = useState('');
     const [agentPrompt, setAgentPrompt] = useState('');
+    const [agentPersona, setAgentPersona] = useState('friendly');
     const [knowledgeBaseIds, setKnowledgeBaseIds] = useState<string[]>([]);
     const [agentActive, setAgentActive] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -73,8 +83,8 @@ function Onboarding() {
                         setCurrentStep('activate');
                     }
                 } else {
-                    // WhatsApp connected but no agent - start from knowledge
-                    setCurrentStep('knowledge');
+                    // WhatsApp connected but no agent - go to agent step
+                    setCurrentStep('agent');
                 }
             } else {
                 // WhatsApp not connected
@@ -97,10 +107,18 @@ function Onboarding() {
     const refreshKnowledge = async () => {
         try {
             const res = await api.get('/knowledge/list');
-            setKnowledgeItems(res.data.items || []);
+            const items = res.data.items || [];
+            setKnowledgeItems(items);
+            // Auto-select all knowledge items
+            setKnowledgeBaseIds(items.map((item: KnowledgeItem) => item.id));
         } catch (e) {
             console.error('Error refreshing knowledge:', e);
         }
+    };
+
+    // Handle upload state change
+    const handleUploadStateChange = (uploading: boolean) => {
+        setIsUploading(uploading);
     };
 
     // WhatsApp connection
@@ -128,7 +146,7 @@ function Onboarding() {
 
             socket.on(`ready-${newSessionId}`, () => {
                 setWhatsappStatus('connected');
-                setTimeout(() => setCurrentStep('knowledge'), 1500);
+                setTimeout(() => setCurrentStep('agent'), 1500);
             });
 
         } catch (error) {
@@ -156,11 +174,11 @@ function Onboarding() {
 
     // Save agent
     const saveAgent = async () => {
-        if (!agentName.trim()) return;
+        if (!agentName.trim() || isUploading) return;
         setSaving(true);
 
         try {
-            const payload = { name: agentName, systemPrompt: agentPrompt, knowledgeBaseIds };
+            const payload = { name: agentName, systemPrompt: agentPrompt, knowledgeBaseIds, persona: agentPersona };
 
             if (agentId) {
                 await api.put(`/agents/${agentId}`, payload);
@@ -192,9 +210,6 @@ function Onboarding() {
         }
     };
 
-
-    // ... (rest of the component)
-
     if (loading) {
         return <PageLoader />;
     }
@@ -202,25 +217,20 @@ function Onboarding() {
     return (
         <div className="onboarding">
             <div className="onboarding-container">
-                {/* Progress */}
-                <div className="steps">
-                    <div className={`step ${currentStep === 'whatsapp' ? 'active' : whatsappStatus === 'connected' ? 'done' : ''}`}>
+                {/* Progress - 3 Steps */}
+                <div className="onboarding-steps">
+                    <div className={`onboarding-step ${currentStep === 'whatsapp' ? 'active' : whatsappStatus === 'connected' ? 'done' : ''}`}>
                         <div className="step-num">{whatsappStatus === 'connected' ? '✓' : '1'}</div>
                         <span>WhatsApp</span>
                     </div>
-                    <div className="step-line"></div>
-                    <div className={`step ${currentStep === 'knowledge' ? 'active' : knowledgeItems.length > 0 ? 'done' : ''}`}>
-                        <div className="step-num">{knowledgeItems.length > 0 ? '✓' : '2'}</div>
-                        <span>Knowledge</span>
-                    </div>
-                    <div className="step-line"></div>
-                    <div className={`step ${currentStep === 'agent' ? 'active' : agentId ? 'done' : ''}`}>
-                        <div className="step-num">{agentId ? '✓' : '3'}</div>
+                    <div className="onboarding-step-line"></div>
+                    <div className={`onboarding-step ${currentStep === 'agent' ? 'active' : agentId ? 'done' : ''}`}>
+                        <div className="step-num">{agentId ? '✓' : '2'}</div>
                         <span>Agent</span>
                     </div>
-                    <div className="step-line"></div>
-                    <div className={`step ${currentStep === 'activate' ? 'active' : agentActive ? 'done' : ''}`}>
-                        <div className="step-num">{agentActive ? '✓' : '4'}</div>
+                    <div className="onboarding-step-line"></div>
+                    <div className={`onboarding-step ${currentStep === 'activate' ? 'active' : agentActive ? 'done' : ''}`}>
+                        <div className="step-num">{agentActive ? '✓' : '3'}</div>
                         <span>Go Live</span>
                     </div>
                 </div>
@@ -263,57 +273,16 @@ function Onboarding() {
                             )}
                         </div>
                     )}
-                    {/* Step 2: Knowledge Base */}
-                    {currentStep === 'knowledge' && (
-                        <div className="step-content fade-in">
-                            <h2>📚 Add Knowledge Base</h2>
-                            <p>Upload files or add URLs for your AI to learn from.</p>
 
-                            <KnowledgeUploader onUploadComplete={refreshKnowledge} />
-
-                            {knowledgeItems.length > 0 && (
-                                <div className="knowledge-list">
-                                    <label className="list-label">Added ({knowledgeItems.length})</label>
-                                    {knowledgeItems.map(item => (
-                                        <div key={item.id} className="knowledge-row">
-                                            <span className="knowledge-icon">
-                                                {item.source_type === 'web' ? '🌐' : '📄'}
-                                            </span>
-                                            <span className="knowledge-name">
-                                                {item.metadata?.filename || item.metadata?.url || 'Document'}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            <div className="step-actions">
-                                <button
-                                    className="btn btn-primary btn-lg"
-                                    onClick={() => setCurrentStep('agent')}
-                                >
-                                    Continue
-                                </button>
-                                {knowledgeItems.length === 0 && (
-                                    <button
-                                        className="btn btn-ghost"
-                                        onClick={() => setCurrentStep('agent')}
-                                    >
-                                        Skip for now
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Step 3: Agent */}
+                    {/* Step 2: Agent + Knowledge (Merged) */}
                     {currentStep === 'agent' && (
                         <div className="step-content fade-in">
                             <h2>🤖 Create Your Agent</h2>
-                            <p>Give your AI a name and select knowledge.</p>
+                            <p>Name your AI and add knowledge for it to learn from.</p>
 
+                            {/* Agent Name */}
                             <div className="form-field">
-                                <label>Agent Name</label>
+                                <label>Agent Name *</label>
                                 <input
                                     type="text"
                                     className="input"
@@ -323,46 +292,89 @@ function Onboarding() {
                                 />
                             </div>
 
+                            {/* Instructions */}
                             <div className="form-field">
-                                <label>Instructions (Optional)</label>
+                                <label>
+                                    Instructions (Optional)
+                                    <a href="/docs" target="_blank" rel="noopener noreferrer" className="docs-link-small">📚 Templates</a>
+                                </label>
                                 <textarea
                                     className="input"
-                                    rows={2}
+                                    rows={3}
                                     placeholder="Leave empty for smart defaults..."
                                     value={agentPrompt}
                                     onChange={(e) => setAgentPrompt(e.target.value)}
                                 />
                             </div>
 
-                            {knowledgeItems.length > 0 && (
-                                <div className="form-field">
-                                    <label>Select Knowledge Base</label>
-                                    <div className="knowledge-select">
-                                        {knowledgeItems.map(item => (
-                                            <label key={item.id} className="knowledge-item">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={knowledgeBaseIds.includes(item.id)}
-                                                    onChange={() => toggleKnowledge(item.id)}
-                                                />
-                                                <span>{item.metadata?.filename || item.metadata?.url || 'Document'}</span>
-                                            </label>
-                                        ))}
-                                    </div>
+                            {/* Persona Selection */}
+                            <div className="form-field">
+                                <label>Communication Style</label>
+                                <div className="persona-buttons">
+                                    {PERSONAS.map(p => (
+                                        <button
+                                            key={p.id}
+                                            type="button"
+                                            className={`persona-btn ${agentPersona === p.id ? 'selected' : ''}`}
+                                            onClick={() => setAgentPersona(p.id)}
+                                        >
+                                            <span className="persona-emoji">{p.emoji}</span>
+                                            <span>{p.name}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Knowledge Upload */}
+                            <div className="form-field">
+                                <label>Knowledge Base (Optional)</label>
+                                <div className="knowledge-section">
+                                    <KnowledgeUploader
+                                        onUploadComplete={refreshKnowledge}
+                                        onUploadStateChange={handleUploadStateChange}
+                                    />
+
+                                    {knowledgeItems.length > 0 && (
+                                        <div className="knowledge-list-compact">
+                                            <span className="list-label">{knowledgeItems.length} item(s) added</span>
+                                            <div className="knowledge-select">
+                                                {knowledgeItems.map(item => (
+                                                    <label key={item.id} className="knowledge-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={knowledgeBaseIds.includes(item.id)}
+                                                            onChange={() => toggleKnowledge(item.id)}
+                                                        />
+                                                        <span>
+                                                            {item.source_type === 'web' ? '🌐' : '📄'}{' '}
+                                                            {item.metadata?.filename || item.metadata?.url || 'Document'}
+                                                        </span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Upload indicator */}
+                            {isUploading && (
+                                <div className="upload-warning">
+                                    ⏳ Uploading... Please wait
                                 </div>
                             )}
 
                             <button
                                 className="btn btn-primary btn-lg"
                                 onClick={saveAgent}
-                                disabled={!agentName.trim() || saving}
+                                disabled={!agentName.trim() || saving || isUploading}
                             >
-                                {saving ? 'Saving...' : 'Continue'}
+                                {saving ? 'Saving...' : isUploading ? 'Please wait...' : 'Continue'}
                             </button>
                         </div>
                     )}
 
-                    {/* Step 4: Activate */}
+                    {/* Step 3: Activate */}
                     {currentStep === 'activate' && (
                         <div className="step-content fade-in">
                             <h2>🚀 Ready to Go Live!</h2>

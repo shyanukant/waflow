@@ -14,12 +14,22 @@ interface KnowledgeItem {
     created_at: string;
 }
 
+// Persona definitions for dropdown
+const PERSONAS = [
+    { id: 'professional', name: 'Professional', description: 'Polished business communication' },
+    { id: 'friendly', name: 'Friendly', description: 'Warm and conversational' },
+    { id: 'casual', name: 'Casual', description: 'Relaxed and informal' },
+    { id: 'formal', name: 'Formal', description: 'Very formal corporate tone' },
+    { id: 'technical', name: 'Technical', description: 'Detailed and precise' },
+];
+
 function AgentCreator() {
     const [existingAgentId, setExistingAgentId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: '',
         systemPrompt: '',
-        knowledgeBaseIds: [] as string[]
+        knowledgeBaseIds: [] as string[],
+        persona: 'friendly'
     });
     const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
     const [loading, setLoading] = useState(false);
@@ -54,15 +64,17 @@ Leave empty to use smart default behavior.`;
                 setExistingAgentId(agent.id);
                 setFormData({
                     name: agent.name || '',
-                    systemPrompt: agent.systemPrompt || '', // Show empty if no custom prompt
-                    knowledgeBaseIds: agent.knowledgeBaseIds || []
+                    systemPrompt: agent.systemPrompt || '',
+                    knowledgeBaseIds: agent.knowledgeBaseIds || [],
+                    persona: agent.persona || 'friendly'
                 });
             } else {
                 // New agent - empty defaults, backend handles smart defaults
                 setFormData({
                     name: '',
                     systemPrompt: '',
-                    knowledgeBaseIds: []
+                    knowledgeBaseIds: [],
+                    persona: 'friendly'
                 });
             }
         } catch (error) {
@@ -203,8 +215,36 @@ Leave empty to use smart default behavior.`;
                                 onChange={(e) => setFormData({ ...formData, systemPrompt: e.target.value })}
                             />
                             <p className="form-hint">
-                                Optional: Add custom instructions for your agent. <Link to="/docs" className="docs-link">📚 Browse Prompt Templates</Link>
+                                Optional: Add custom instructions for your agent. <a href="/docs" target="_blank" rel="noopener noreferrer" className="docs-link">📚 Browse Prompt Templates</a>
                             </p>
+                        </div>
+                    </div>
+
+                    {/* Section 2.5: Persona */}
+                    <div className="form-section card">
+                        <h2 className="card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                                <line x1="9" y1="9" x2="9.01" y2="9" />
+                                <line x1="15" y1="9" x2="15.01" y2="9" />
+                            </svg>
+                            Communication Style
+                        </h2>
+                        <div className="form-group">
+                            <div className="persona-grid">
+                                {PERSONAS.map(persona => (
+                                    <div
+                                        key={persona.id}
+                                        className={`persona-card ${formData.persona === persona.id ? 'selected' : ''}`}
+                                        onClick={() => setFormData({ ...formData, persona: persona.id })}
+                                    >
+                                        <h4>{persona.name}</h4>
+                                        <p>{persona.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="form-hint">Choose how your agent communicates with users.</p>
                         </div>
                     </div>
 
