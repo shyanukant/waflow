@@ -29,6 +29,15 @@ interface Notification {
     time: Date;
 }
 
+interface TrialStatus {
+    isTrialActive: boolean;
+    isTrialExpired: boolean;
+    hoursRemaining: number;
+    minutesRemaining: number;
+    connectionMode: 'trial' | 'api';
+    hasApiKey: boolean;
+}
+
 function Dashboard() {
     const [userName, setUserName] = useState('');
     const [whatsappConnected, setWhatsappConnected] = useState(false);
@@ -41,6 +50,7 @@ function Dashboard() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const [showSetupAlert, setShowSetupAlert] = useState(false);
+    const [trialStatus, setTrialStatus] = useState<TrialStatus | null>(null);
     const navigate = useNavigate();
 
     const previousLeadCount = useRef(0);
@@ -53,6 +63,21 @@ function Dashboard() {
             setUserName(user?.user_metadata?.full_name || 'there');
         };
         loadUserData();
+
+        // Load trial status
+        const loadTrialStatus = async () => {
+            try {
+                const res = await api.get('/settings/trial');
+                setTrialStatus(res.data);
+            } catch (error) {
+                console.error('Failed to load trial status');
+            }
+        };
+        loadTrialStatus();
+
+        // Refresh trial status every minute
+        const trialInterval = setInterval(loadTrialStatus, 60000);
+        return () => clearInterval(trialInterval);
     }, []);
 
     // Fetch real-time data (reusable)
@@ -193,6 +218,17 @@ function Dashboard() {
                         </h1>
                     </div>
                     <div className="header-right">
+                        {/* Trial Status */}
+                        {trialStatus && trialStatus.connectionMode === 'trial' && (
+                            <Link to="/settings" className={`trial-badge ${trialStatus.isTrialExpired ? 'expired' : ''}`}>
+                                {trialStatus.isTrialExpired ? (
+                                    <span>⚠️ Trial Expired</span>
+                                ) : (
+                                    <span>⏱️ {trialStatus.hoursRemaining}h {trialStatus.minutesRemaining}m left</span>
+                                )}
+                            </Link>
+                        )}
+                        <Link to="/settings" className="btn btn-ghost btn-small">⚙️</Link>
                         <span className="user-greeting">Hey, {userName}!</span>
                         <button className="btn btn-ghost btn-small" onClick={handleLogout}>
                             Logout

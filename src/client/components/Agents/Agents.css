@@ -67,6 +67,17 @@
     margin-top: var(--spacing-sm);
 }
 
+.docs-link {
+    color: #a855f7;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: var(--spacing-sm);
+}
+
+.docs-link:hover {
+    text-decoration: underline;
+}
+
 /* Upload Methods */
 .upload-methods {
     display: flex;

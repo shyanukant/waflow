@@ -13,6 +13,8 @@ import AgentCreator from './components/Agents/AgentCreator';
 import Analytics from './components/Analytics/Analytics';
 import Leads from './components/Leads/Leads';
 import Landing from './components/Landing/Landing';
+import Settings from './components/Settings/Settings';
+import Docs from './components/Docs/Docs';
 import PageLoader from './components/common/PageLoader';
 
 function App() {
@@ -55,6 +57,8 @@ function App() {
                 <Route path="/agent" element={session ? <AgentCreator /> : <Navigate to="/login" />} />
                 <Route path="/analytics" element={session ? <Analytics /> : <Navigate to="/login" />} />
                 <Route path="/leads" element={session ? <Leads /> : <Navigate to="/login" />} />
+                <Route path="/settings" element={session ? <Settings /> : <Navigate to="/login" />} />
+                <Route path="/docs" element={session ? <Docs /> : <Navigate to="/login" />} />
 
                 {/* Catch all */}
                 <Route path="*" element={<Navigate to={session ? "/dashboard" : "/"} />} />

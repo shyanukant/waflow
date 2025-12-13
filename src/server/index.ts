@@ -13,6 +13,8 @@ import knowledgeRoutes from './routes/knowledge.js';
 import agentRoutes from './routes/agents.js';
 import analyticsRoutes from './routes/analytics.js';
 import leadsRoutes from './routes/leads.js';
+import settingsRoutes from './routes/settings.js';
+import calendarRoutes from './routes/calendar.js';
 
 // Import middleware
 import { authenticateUser } from './middleware/auth.js';
@@ -61,6 +63,8 @@ app.use('/api/knowledge', authenticateUser, knowledgeRoutes);
 app.use('/api/agents', authenticateUser, agentRoutes);
 app.use('/api/analytics', authenticateUser, analyticsRoutes);
 app.use('/api/leads', authenticateUser, leadsRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/calendar', calendarRoutes);
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {

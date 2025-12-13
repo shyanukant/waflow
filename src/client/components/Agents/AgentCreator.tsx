@@ -203,7 +203,7 @@ Leave empty to use smart default behavior.`;
                                 onChange={(e) => setFormData({ ...formData, systemPrompt: e.target.value })}
                             />
                             <p className="form-hint">
-                                Optional: Add custom instructions for your agent. Leave empty for smart defaults.
+                                Optional: Add custom instructions for your agent. <Link to="/docs" className="docs-link">📚 Browse Prompt Templates</Link>
                             </p>
                         </div>
                     </div>

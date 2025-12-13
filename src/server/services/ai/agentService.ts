@@ -1,6 +1,7 @@
 // AI Agent Service - OpenRouter + Pinecone RAG Integration
 import { searchKnowledge } from '../pinecone/vectorStore.js';
 import { db, conversations } from '../../db/index.js';
+import { buildSystemPrompt, buildPromptWithTools, PROMPT_CONFIG } from '../../prompts/systemPrompt.js';
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -15,6 +16,12 @@ interface AgentConfig {
     systemPrompt?: string | null;
     knowledgeBaseIds?: string[];
     userId: string;
+    // New advanced options
+    industryId?: string;
+    personaId?: string;
+    enableTools?: boolean;
+    businessHours?: string;
+    currentPromotion?: string;
 }
 
 // Default fallback message when AI fails
@@ -25,109 +32,26 @@ We've recorded your message and will get back to you soon.
 If you have anything else to share, please feel free to send it here.`;
 
 /**
- * Build a STRICT system prompt that forces agent to only use knowledge base
+ * Helper to build the system prompt using the advanced prompt module
  */
-const buildSystemPrompt = (agent: AgentConfig, ragContext: string, leadContext?: string): string => {
+const buildPromptForAgent = (agent: AgentConfig, ragContext: string, leadContext?: string): string => {
     const agentName = agent.name || 'Assistant';
-    const hasKnowledge = ragContext && ragContext.trim().length > 50;
+    const hasKnowledge = !!(ragContext && ragContext.trim().length > 50);
 
-    // VERY STRICT prompt that prevents hallucination
-    let prompt = `# CRITICAL INSTRUCTIONS - YOU MUST FOLLOW EXACTLY
-
-## YOUR IDENTITY
-- Your name is "${agentName}"
-- NEVER say you are ChatGPT, OpenAI, AI, Claude, assistant, or any AI name
-- When asked who you are, say: "I'm ${agentName}"
-
-## GREETING RULES - VERY IMPORTANT
-- When user says hi/hello/hey, respond: "Hi! I'm ${agentName}" or "Hello! I'm ${agentName}, how can I help you?"
-- NEVER say "Hi, ${agentName}!" - that would be greeting yourself which is wrong
-- ${agentName} is YOUR name, not the user's name
-- You don't know the user's name unless they tell you
-- Example CORRECT: "Hi there! I'm ${agentName} 👋 How can I help you today?"
-- Example WRONG: "Hi, ${agentName}!" (this greets yourself, which is nonsense)
-
-## KNOWLEDGE RULES - EXTREMELY IMPORTANT
-${hasKnowledge ? `
-✅ I HAVE LOADED knowledge for you below. USE ONLY THIS INFORMATION.
-- Answer questions ONLY using the KNOWLEDGE BASE section below
-- COPY names, terms, and details EXACTLY as written (don't change spelling or capitalization)
-- If the answer is in the knowledge base, provide it confidently
-- If the answer is NOT in the knowledge base, say: "I don't have that specific information. Would you like me to have our team reach out to you? Just share your email!"
-` : `
-⚠️ NO KNOWLEDGE BASE LOADED - You have no specific information available.
-- For ANY specific question about products, services, pricing, company details - say:
-  "I'd love to help you with that! Let me connect you with our team. May I have your email so they can reach out with the details?"
-- Do NOT make up any information
-- Do NOT use general knowledge or training data
-`}
-
-## RESPONSE RULES
-- Keep responses SHORT (under 100 words)
-- Friendly and professional tone
-- 1-2 emojis maximum
-- Remember conversation context
-
-## WHEN USER ASKS FOR INFO YOU DON'T HAVE
-This is CRITICAL - when you don't have the answer:
-1. Acknowledge you don't have that specific information
-2. Offer to connect them with a human
-3. Ask for their email (if not already collected)
-4. Example: "I don't have those specific details, but I'd love to help! Want me to have our team reach out? Just share your email 😊"
-
-## RULE 4: RESPONSE STYLE
-- Short responses (under 150 words)
-- Friendly and professional
-- 1-2 emojis maximum
-- Remember the conversation context - user has been talking to you
-
-## RULE 5: LEAD CAPTURE - WHEN TO ASK FOR CONTACT
-${leadContext || '- We already have user contact (WhatsApp number)'}
-
-COLLECT NAME WHEN:
-- User shows buying interest (wants to book, buy, purchase, hire)
-- User asks about pricing, projects, or services
-- Say naturally: "By the way, what should I call you?" or "May I know your name?"
-
-COLLECT EMAIL WHEN:
-- User wants: booking, quote, pricing, detailed info, project discussion
-- User asks about something NOT in the knowledge base (custom requests, specific details)
-- You need to send them information or have someone follow up
-- Say: "I'd love to send you more details! What's your email?" or "To connect you with our team, may I have your email?"
-
-IMPORTANT:
-- If user asks for info you DON'T have → offer to connect them with a human and ask for email
-- DON'T repeatedly ask for contact info if you already asked in this conversation
-- Make it natural, not robotic
-
-DO NOT repeatedly ask for contact info. If you already asked, don't ask again.
-`;
-
-    // Add user's custom instructions if provided
-    const userPrompt = agent.systemPrompt?.trim();
-    if (userPrompt && userPrompt.length > 20) {
-        prompt += `\n## OWNER INSTRUCTIONS\n${userPrompt}\n`;
-    }
-
-    // Add knowledge base context - STRICT
-    if (ragContext && ragContext.trim().length > 0) {
-        prompt += `
-## KNOWLEDGE BASE (YOUR ONLY INFORMATION SOURCE)
-IMPORTANT: Below is the ONLY information you can use. Do NOT add anything from outside.
-
-${ragContext}
-
-If user asks about something NOT in the above knowledge, say you don't have that information.`;
-    } else {
-        prompt += `
-## NO KNOWLEDGE LOADED
-- Greet user as ${agentName}
-- Say you're here to help
-- For specific questions, say: "I don't have that information right now. Would you like me to have someone reach out to you?"
-- DO NOT make up any information`;
-    }
-
-    return prompt;
+    return buildSystemPrompt({
+        agentName,
+        hasKnowledge,
+        ragContext,
+        leadContext: leadContext || '- We have user contact (WhatsApp number)',
+        userCustomPrompt: agent.systemPrompt || undefined,
+        // Advanced options
+        industryId: agent.industryId,
+        personaId: agent.personaId,
+        enableTools: agent.enableTools,
+        currentTime: new Date(),
+        businessHours: agent.businessHours,
+        currentPromotion: agent.currentPromotion,
+    });
 };
 
 /**
@@ -188,7 +112,7 @@ export const generateAgentResponse = async (
         }
 
         // Step 2: Build intelligent system prompt
-        const systemPrompt = buildSystemPrompt(agent, ragContext, leadContext);
+        const systemPrompt = buildPromptForAgent(agent, ragContext, leadContext);
 
         // DEBUG: Log what's being sent to AI
         console.log(`🤖 Agent: "${agent.name}" | Knowledge IDs: ${agent.knowledgeBaseIds?.length || 0}`);

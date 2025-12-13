@@ -17,6 +17,7 @@ import pino from 'pino';
 import { db, whatsappSessions } from '../../db/index.js';
 import { eq } from 'drizzle-orm';
 import type { Server } from 'socket.io';
+import { startTrial, canUseWhatsApp } from '../trial/trialService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +44,17 @@ export class SessionManager {
      */
     async createSession(userId: string, sessionId: string) {
         try {
+            // Check trial status before allowing connection
+            const trialCheck = await canUseWhatsApp(userId);
+            if (!trialCheck.allowed) {
+                return { success: false, error: trialCheck.reason };
+            }
+
+            // Start trial if this is user's first connection (trial not started yet)
+            await startTrial(userId).catch(() => {
+                // Ignore if trial already started
+            });
+
             // Check if session already exists
             if (whatsappSockets.has(sessionId)) {
                 return { success: false, error: 'Session already exists' };

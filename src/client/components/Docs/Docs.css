@@ -1,0 +1,383 @@
+/* Docs Page Styles */
+
+.docs-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+    color: white;
+}
+
+/* Header */
+.docs-header {
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.docs-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.back-link {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-bottom: 1rem;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: #a855f7;
+}
+
+.docs-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.docs-header p {
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+/* Tabs */
+.docs-tabs {
+    display: flex;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.docs-tabs .tab {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    position: relative;
+    top: 1px;
+}
+
+.docs-tabs .tab:hover {
+    color: white;
+}
+
+.docs-tabs .tab.active {
+    color: #a855f7;
+    border-bottom-color: #a855f7;
+}
+
+/* Content */
+.docs-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Templates Section */
+.section-intro {
+    margin-bottom: 2rem;
+}
+
+.section-intro h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-intro p {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.template-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+}
+
+.template-card:hover {
+    border-color: rgba(168, 85, 247, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.template-header {
+    margin-bottom: 1rem;
+}
+
+.template-header h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+}
+
+.template-desc {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.template-prompt {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    font-family: 'Fira Code', monospace;
+}
+
+.copy-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+.copy-btn.copied {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+/* GitHub Link */
+.github-link {
+    margin-top: 3rem;
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.github-link p {
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 0.5rem;
+}
+
+.github-link a {
+    color: #a855f7;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.github-link a:hover {
+    text-decoration: underline;
+}
+
+/* Guide Section */
+.guide-section h2 {
+    margin-bottom: 2rem;
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.step {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.step-content p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+.step-content a {
+    color: #a855f7;
+    text-decoration: none;
+}
+
+.step-content a:hover {
+    text-decoration: underline;
+}
+
+.info-box {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(168, 85, 247, 0.1);
+    border-left: 3px solid #a855f7;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Tips Section */
+.tips-section h2 {
+    margin-bottom: 2rem;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tip-card {
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.tip-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.tip-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+}
+
+.tip-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.best-practices,
+.prompt-structure {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+
+.best-practices h3,
+.prompt-structure h3 {
+    margin: 0 0 1rem 0;
+}
+
+.best-practices ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.best-practices li {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.structure-example {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: pre-wrap;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+}
+
+/* Footer */
+.docs-footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 3rem;
+}
+
+.docs-footer p {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0.5rem 0;
+}
+
+.docs-footer a {
+    color: #a855f7;
+    text-decoration: none;
+}
+
+.docs-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .docs-header {
+        padding: 1.5rem 1rem;
+    }
+
+    .docs-tabs {
+        padding: 0 1rem;
+        overflow-x: auto;
+    }
+
+    .docs-tabs .tab {
+        padding: 1rem;
+        white-space: nowrap;
+    }
+
+    .docs-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .templates-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .step {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+}

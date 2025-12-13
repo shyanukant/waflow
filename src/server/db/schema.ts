@@ -6,6 +6,14 @@ export const users = pgTable('users', {
     id: uuid('id').primaryKey(),
     email: text('email').unique().notNull(),
     fullName: text('full_name'),
+    // Trial and WhatsApp API settings
+    trialStartedAt: timestamp('trial_started_at'),  // When 24h trial started
+    connectionMode: text('connection_mode').default('trial').notNull(), // 'trial' or 'api'
+    whatsappProvider: text('whatsapp_provider'), // 'meta', 'twilio', '360dialog', null for trial
+    whatsappApiKey: text('whatsapp_api_key'), // Provider API key/token
+    whatsappPhoneNumberId: text('whatsapp_phone_number_id'), // For Meta Cloud API
+    // Google Calendar integration
+    googleCalendarToken: jsonb('google_calendar_token'), // OAuth tokens for Google Calendar
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
