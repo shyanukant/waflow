@@ -1,0 +1,50 @@
+{
+    "name": "waflow-backend",
+    "version": "1.0.0",
+    "description": "WAFlow Backend API - WhatsApp Automation Agent Platform",
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "setup": "tsx scripts/setup-appwrite.ts"
+    },
+    "keywords": [
+        "whatsapp",
+        "automation",
+        "ai",
+        "agent",
+        "appwrite"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "@hapi/boom": "^10.0.1",
+        "@pinecone-database/pinecone": "^6.1.3",
+        "@whiskeysockets/baileys": "^6.7.7",
+        "axios": "^1.6.5",
+        "baileys": "^7.0.0-rc.9",
+        "cheerio": "^1.0.0-rc.12",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "googleapis": "^168.0.0",
+        "mammoth": "^1.6.0",
+        "multer": "^1.4.5-lts.1",
+        "node-appwrite": "^14.1.0",
+        "pdf-parse": "^1.1.1",
+        "pdfjs-dist": "^3.11.174",
+        "pino": "^8.19.0",
+        "qrcode": "^1.5.3",
+        "qrcode-terminal": "^0.12.0",
+        "socket.io": "^4.6.1"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.21",
+        "@types/multer": "^1.4.11",
+        "@types/node": "^20.10.6",
+        "@types/qrcode": "^1.5.5",
+        "tsx": "^4.7.0",
+        "typescript": "^5.3.3"
+    }
+}

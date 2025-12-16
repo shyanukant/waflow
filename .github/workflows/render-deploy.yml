@@ -1,18 +1,21 @@
 # Render Deployment Workflow
-# Automatically deploys to Render when pushing to main branch
+# Only deploys backend to Render when backend files change
 
-name: Deploy to Render
+name: Deploy Backend to Render
 
 on:
   push:
     branches:
       - main
       - master
+    paths:
+      - 'backend/**'
+      - '.github/workflows/render-deploy.yml'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
   deploy:
-    name: Deploy to Render
+    name: Deploy Backend to Render
     runs-on: ubuntu-latest
     
     steps:
@@ -25,3 +28,5 @@ jobs:
           service-id: ${{ secrets.RENDER_SERVICE_ID }}
           api-key: ${{ secrets.RENDER_API_KEY }}
 
+      - name: Deployment Complete
+        run: echo "✅ Backend deployed to https://waflow.onrender.com"

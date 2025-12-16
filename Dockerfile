@@ -1,28 +1,40 @@
-FROM node:20-slim
+# Build stage
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci
 
-# Copy source code
-COPY . .
+# Copy source
+COPY backend/ .
 
-# Build the application
+# Build TypeScript
 RUN npm run build
 
-# Create sessions directory for WhatsApp
-RUN mkdir -p /app/sessions
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install production dependencies only
+COPY backend/package*.json ./
+RUN npm ci --only=production
+
+# Copy built files
+COPY --from=builder /app/dist ./dist
+
+# Create sessions directory
+RUN mkdir -p /app/auth_sessions
 
 # Expose port
 EXPOSE 5000
 
-# Set environment
+# Environment
 ENV NODE_ENV=production
-ENV PORT=5000
 
-# Start the server
-CMD ["npm", "start"]
+# Start
+CMD ["node", "dist/index.js"]
