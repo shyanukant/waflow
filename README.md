@@ -1,287 +1,140 @@
-# WAFlow
+# WAFlow - WhatsApp Automation Platform
 
-<div align="center">
+AI-powered WhatsApp automation with conversational AI agents, knowledge base RAG, and lead capture.
 
-![WAFlow Logo](https://img.shields.io/badge/WAFlow-AI%20WhatsApp%20Automation-6366f1?style=for-the-badge&logo=whatsapp&logoColor=white)
+## Features
 
-**AI-Powered WhatsApp Automation Platform**
+- 🤖 **AI Agents** - Custom AI assistants with knowledge base
+- 📚 **RAG Knowledge Base** - Upload docs, URLs for contextual responses
+- 📱 **Hybrid WhatsApp** - 24-hour Baileys trial → WhatsApp Business API
+- 📊 **Lead Capture** - Automatic extraction of names, emails, phone numbers
+- 📈 **Analytics** - Conversation stats and lead tracking
+- 🔐 **Appwrite Auth** - Secure authentication with email verification
 
-Create intelligent chatbots with custom knowledge bases, lead capture, and calendar integration.
+## Architecture
 
-[![Demo](https://img.shields.io/badge/▶️%20Watch%20Demo-YouTube-red?style=for-the-badge&logo=youtube)](https://youtu.be/-anZcc3O_MQ)
-[![Sponsor](https://img.shields.io/badge/💖%20Sponsor-Support-ff69b4?style=for-the-badge&logo=github)](https://github.com/sponsors/shyanukant)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-
-</div>
-
----
-
-## 🎬 Demo
-
-[![WAFlow Demo](https://img.youtube.com/vi/-anZcc3O_MQ/maxresdefault.jpg)](https://youtu.be/-anZcc3O_MQ)
-
----
-
-## ✨ Features
-
-### Core Features
-| Feature | Description |
-|---------|-------------|
-| 🤖 **AI Agents** | Create intelligent WhatsApp chatbots with custom prompts |
-| 📚 **Knowledge Base** | Train with PDFs, DOCX, URLs, Google Docs |
-| 🔗 **Easy Setup** | Connect WhatsApp via QR code scan |
-| 📊 **Analytics** | Track conversations, messages, and leads |
-| 🎯 **Lead Capture** | Auto-collect names, emails, interests |
-| 🚀 **Real-time** | Instant AI-powered responses |
-
-### Advanced Features
-| Feature | Description |
-|---------|-------------|
-| 📅 **Calendar Integration** | Google Calendar for meetings/reminders |
-| 🌍 **Multi-Language** | Auto-detect and respond in user's language |
-| 🎯 **Trigger Detection** | Auto-detect meeting/reminder/lead intents |
-| 📝 **Prompt Templates** | 8+ industry templates (E-commerce, SaaS, etc.) |
-| 🎭 **Personas** | 5 communication styles (Professional, Friendly, etc.) |
-| ⏰ **Follow-ups** | Automated reminder and follow-up sequences |
-| � **In-App Docs** | Built-in documentation with templates |
-
----
-
-## 🏗️ Architecture
-
-```mermaid
-graph TB
-    subgraph Frontend
-        A[React App] --> B[Dashboard]
-        A --> C[Agent Creator]
-        A --> D[Analytics]
-        A --> E[Leads]
-        A --> F[Docs]
-    end
-    
-    subgraph Backend
-        G[Express Server] --> H[WhatsApp Service]
-        G --> I[AI Service]
-        G --> J[Knowledge Service]
-        G --> K[Calendar Service]
-    end
-    
-    subgraph External
-        H --> L[Baileys/WhatsApp]
-        I --> M[OpenRouter AI]
-        J --> N[Pinecone Vector DB]
-        K --> O[Google Calendar]
-    end
-    
-    subgraph Database
-        P[(PostgreSQL/Supabase)]
-    end
-    
-    G --> P
+```
+waflow/
+├── frontend/          # React + Vite (Appwrite Sites)
+├── backend/           # Express + Baileys + Meta API (VPS/Docker)
+├── .github/workflows/ # CI/CD pipelines
+├── Dockerfile         # Backend container
+└── docker-compose.yml # Production deployment
 ```
 
----
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
-
 - Node.js 20+
-- PostgreSQL (Supabase)
-- Pinecone account (free tier works)
+- Appwrite Cloud account
+- Pinecone account
 - OpenRouter API key
 
-### Installation
+### 1. Clone and Install
 
 ```bash
-# Clone repository
-git clone https://github.com/shyanukant/waflow.git
+git clone <repo>
 cd waflow
 
-# Install dependencies
-npm install
+# Install backend
+cd backend && npm install
 
-# Setup environment
-cp .env.example .env
-# Edit .env with your credentials
-
-# Run migrations
-npm run db:migrate
-
-# Start development
-npm run dev
+# Install frontend
+cd ../frontend && npm install
 ```
 
-### Environment Variables
+### 2. Configure Environment
 
+**Backend** (`backend/.env`):
 ```env
-# Supabase
-SUPABASE_URL=your-supabase-url
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+# Appwrite
+APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+APPWRITE_PROJECT_ID=your-project-id
+APPWRITE_API_KEY=your-api-key
+APPWRITE_DATABASE_ID=your-database-id
 
 # AI
 OPENROUTER_API_KEY=your-openrouter-key
 
-# Vector Database
+# Pinecone
 PINECONE_API_KEY=your-pinecone-key
-PINECONE_INDEX_NAME=waflow-kb
+PINECONE_INDEX_NAME=waflow
 
-# Google Calendar (Optional)
-GOOGLE_CLIENT_ID=your-client-id
-GOOGLE_CLIENT_SECRET=your-client-secret
+# WhatsApp Webhook (for Meta Cloud API)
+WHATSAPP_WEBHOOK_VERIFY_TOKEN=your-verify-token
+
+# Frontend URL (for CORS)
+FRONTEND_URL=http://localhost:5173
 ```
 
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | React, Vite, TypeScript |
-| **Backend** | Node.js, Express, TypeScript |
-| **Database** | PostgreSQL (Supabase), Drizzle ORM |
-| **AI** | OpenRouter (GPT-4, Claude, etc.) |
-| **Vector DB** | Pinecone |
-| **WhatsApp** | Baileys (Web API) |
-| **Calendar** | Google Calendar API |
-
----
-
-## 📁 Project Structure
-
-```
-waflow/
-├── src/
-│   ├── client/                 # React Frontend
-│   │   ├── components/
-│   │   │   ├── Agents/         # Agent creator
-│   │   │   ├── Analytics/      # Stats dashboard
-│   │   │   ├── Dashboard/      # Main dashboard
-│   │   │   ├── Docs/           # In-app documentation
-│   │   │   ├── Knowledge/      # Knowledge upload
-│   │   │   ├── Leads/          # Lead management
-│   │   │   ├── Settings/       # API & calendar settings
-│   │   │   └── WhatsApp/       # QR scanner
-│   │   └── services/           # API clients
-│   │
-│   └── server/                 # Express Backend
-│       ├── db/                 # Drizzle schema
-│       ├── middleware/         # Auth middleware
-│       ├── prompts/            # AI prompt system
-│       │   ├── systemPrompt.ts # Main prompt builder
-│       │   ├── tools.ts        # Function tools
-│       │   ├── industryTemplates.ts
-│       │   └── personas.ts
-│       ├── routes/             # API routes
-│       └── services/
-│           ├── ai/             # AI agent service
-│           ├── calendar/       # Google Calendar
-│           ├── knowledge/      # Document processing
-│           ├── pinecone/       # Vector store
-│           └── whatsapp/       # WhatsApp connection
-│
-├── dist/                       # Production build
-└── sessions/                   # WhatsApp sessions
+**Frontend** (`frontend/.env`):
+```env
+VITE_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+VITE_APPWRITE_PROJECT_ID=your-project-id
+VITE_API_URL=http://localhost:5000
 ```
 
----
-
-## 📝 Prompt Templates
-
-Built-in templates for quick setup:
-
-| Template | Use Case |
-|----------|----------|
-| 🛒 E-commerce | Product help, shipping, returns |
-| 🏠 Real Estate | Listings, viewings, pricing |
-| 💻 SaaS | Demos, features, integrations |
-| 🏥 Healthcare | Appointments, hours (no medical advice) |
-| 💼 Services | Quotes, projects, consultations |
-| 📋 Lead Capture | Focus on collecting contacts |
-| 📅 Appointments | Meeting scheduling focus |
-| 🎧 Support | Issue resolution, FAQs |
-
-Access templates in-app at `/docs`
-
----
-
-## 🔧 API Endpoints
-
-### Core APIs
-```
-POST /api/auth/login          # User login
-POST /api/auth/register       # User registration
-GET  /api/whatsapp/status     # Connection status
-POST /api/whatsapp/connect    # Generate QR
-GET  /api/agents              # List agents
-POST /api/agents              # Create agent
-GET  /api/leads               # Get leads
-GET  /api/analytics           # Get stats
-```
-
-### Calendar APIs
-```
-GET  /api/calendar/status     # Check connection
-GET  /api/calendar/connect    # OAuth URL
-GET  /api/calendar/callback   # OAuth callback
-```
-
----
-
-## 🚀 Deployment
-
-### Render (Recommended)
-
-1. Connect GitHub repo to Render
-2. **Build Command:** `npm ci && npm run build`
-3. **Start Command:** `npm start`
-4. Add environment variables
-5. Deploy!
-
-### Docker
+### 3. Setup Appwrite Collections
 
 ```bash
-docker build -t waflow .
-docker run -p 3000:3000 --env-file .env waflow
+cd backend
+npm run setup
 ```
 
----
+### 4. Run Development
 
-## � Documentation
+```bash
+# Terminal 1 - Backend
+cd backend && npm run dev
 
-- 📱 **In-App Docs:** `/docs` (after login)
-- 📖 **GitHub Wiki:** [Full Documentation](https://github.com/shyanukant/waflow/wiki)
+# Terminal 2 - Frontend
+cd frontend && npm run dev
+```
 
----
+## WhatsApp Integration
 
-## 🤝 Contributing
+### Trial Mode (24 hours)
+- QR code scanning via Baileys
+- Automatic session management
+- Timer in dashboard
 
-Contributions welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+### Production Mode (WhatsApp Business API)
+1. Create Meta Business account
+2. Set up WhatsApp Business Platform
+3. Add API key in Settings page
+4. Configure webhook URL: `https://your-backend/api/webhook`
 
----
+## Deployment
 
-## 📄 License
+### Backend (Render)
 
-MIT License - see [LICENSE](LICENSE)
+Auto-deploys from `main` branch via GitHub Action. Backend URL: `https://waflow.onrender.com`
 
----
+Required GitHub Secrets:
+- `RENDER_SERVICE_ID` - Render service ID
+- `RENDER_API_KEY` - Render API key
 
-## 💖 Support
+### Frontend (Appwrite Sites)
 
-If you find WAFlow useful, consider:
-- ⭐ Starring the repo
-- 🐛 Reporting bugs
-- 💡 Suggesting features
-- 💖 [Sponsoring](https://github.com/sponsors/shyanukant)
+Push to `main` branch → GitHub Action deploys automatically
 
----
+Required GitHub Secrets:
+- `APPWRITE_API_KEY` - Appwrite API key
+- `APPWRITE_SITE_ID` - Appwrite Sites ID
 
-<div align="center">
+## API Endpoints
 
-Made with ❤️ by [Shyanukant](https://github.com/shyanukant)
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/auth/register` | Register new user |
+| `POST /api/auth/login` | Login |
+| `POST /api/whatsapp/connect` | Start Baileys session |
+| `POST /api/webhook` | Meta webhook (public) |
+| `GET /api/settings/trial` | Get trial status |
+| `POST /api/settings/api-key` | Save WhatsApp API key |
+| `POST /api/knowledge/upload` | Upload document |
+| `POST /api/agents/create` | Create AI agent |
 
-</div>
+## License
+
+MIT
