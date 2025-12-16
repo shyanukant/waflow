@@ -30,9 +30,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
+
+// Get frontend URL and ensure no trailing slash
+const frontendUrl = (process.env.FRONTEND_URL || '').replace(/\/$/, '') || '*';
+
 const io = new Server(httpServer, {
     cors: {
-        origin: process.env.FRONTEND_URL || '*',
+        origin: frontendUrl,
         credentials: true
     }
 });
@@ -42,7 +46,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 // Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: frontendUrl,
     credentials: true
 }));
 app.use(express.json());
