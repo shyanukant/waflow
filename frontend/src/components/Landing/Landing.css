@@ -714,34 +714,46 @@
     align-items: center;
 }
 
-.steps {
+/* Desktop: Horizontal Steps - scoped to prevent conflicts */
+.how-it-works .steps {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: flex-start;
-    gap: 0;
-    max-width: 1100px;
+    align-items: stretch;
+    gap: 2rem;
+    max-width: 1200px;
     margin: 0 auto;
     position: relative;
 }
 
-/* The step wrapper for positioning connectors */
-.step {
+/* Each step - glassy card container */
+.how-it-works .step {
     flex: 1;
     flex-direction: column;
     text-align: center;
-    padding: 2rem 1.5rem;
-    background: transparent;
-    border: none;
+    padding: 2.5rem 2rem;
+    background: rgba(17, 25, 22, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    border-radius: 24px;
     position: relative;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.how-it-works .step:hover {
+    transform: translateY(-8px);
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(34, 197, 94, 0.1);
+    background: rgba(22, 32, 28, 0.85);
 }
 
 /* Node circle - the main number circle */
-.step-number {
+.how-it-works .step-number {
     width: 70px;
     height: 70px;
-    background: var(--bg-card);
+    background: rgba(17, 25, 22, 0.9);
     border: 3px solid var(--primary);
     color: var(--primary);
     font-size: 1.5rem;
@@ -754,11 +766,11 @@
     position: relative;
     z-index: 2;
     transition: all 0.4s ease;
-    box-shadow: 0 0 0 0 var(--glow);
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.2);
 }
 
 /* Pulse ring animation on node */
-.step-number::before {
+.how-it-works .step-number::before {
     content: '';
     position: absolute;
     width: 100%;
@@ -781,57 +793,59 @@
     }
 }
 
-/* Connector line between nodes */
-.step:not(:last-child)::after {
+/* Connector line between step numbers - extends from number to number */
+.how-it-works .step:not(:last-child)::after {
     content: '';
     position: absolute;
-    top: 35px;
-    left: calc(50% + 45px);
-    width: calc(100% - 90px);
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary) 0%, var(--border) 50%, var(--primary) 100%);
+    top: calc(2.5rem + 33px);
+    /* align with center of step-number */
+    left: calc(50% + 40px);
+    /* start after step number circle */
+    width: calc(100% - 80px + 2rem);
+    /* extend to next step number */
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary) 0%, rgba(34, 197, 94, 0.3) 50%, var(--primary) 100%);
     background-size: 200% 100%;
-    z-index: 1;
-    transition: all 0.4s ease;
+    z-index: 5;
+    border-radius: 2px;
 }
 
-/* Animated dot traveling on the line */
-.step:not(:last-child)::before {
+/* Animated glowing dot - travels left to right */
+.how-it-works .step:not(:last-child)::before {
     content: '';
     position: absolute;
-    top: 32px;
-    left: calc(50% + 45px);
-    width: 10px;
-    height: 10px;
+    top: calc(2.5rem + 28px);
+    /* align with line */
+    left: calc(50% + 40px);
+    /* start position */
+    width: 14px;
+    height: 14px;
     background: var(--primary);
     border-radius: 50%;
-    z-index: 3;
+    z-index: 15;
+    box-shadow: 0 0 20px var(--primary), 0 0 40px var(--primary);
     opacity: 0;
-    box-shadow: 0 0 15px var(--primary);
-    transition: opacity 0.3s;
 }
 
-/* Hover effects on step */
-.step:hover .step-number {
+/* Hover effects - animate connections */
+.how-it-works .step:hover:not(:last-child)::after {
+    animation: flow-line 1.5s linear infinite;
+}
+
+.how-it-works .step:hover:not(:last-child)::before {
+    opacity: 1;
+    animation: travel-dot-lr 1.5s ease-in-out infinite;
+}
+
+.how-it-works .step:hover .step-number {
     background: var(--primary);
     color: #000;
     transform: scale(1.1);
-    box-shadow: 0 0 30px var(--glow);
+    box-shadow: 0 0 40px var(--glow);
 }
 
-.step:hover .step-number::before {
+.how-it-works .step:hover .step-number::before {
     animation: none;
-}
-
-/* Animate connector on hover */
-.step:hover:not(:last-child)::after {
-    background-position: -100% 0;
-    animation: flow-line 1s linear infinite;
-}
-
-.step:hover:not(:last-child)::before {
-    opacity: 1;
-    animation: travel-dot 1.5s ease-in-out infinite;
 }
 
 @keyframes flow-line {
@@ -844,30 +858,38 @@
     }
 }
 
-@keyframes travel-dot {
+@keyframes travel-dot-lr {
     0% {
-        left: calc(50% + 45px);
+        left: calc(50% + 40px);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
         opacity: 1;
     }
 
     100% {
-        left: calc(100% + 35px);
+        left: calc(150% - 40px + 2rem);
         opacity: 0;
     }
 }
 
-.step-icon {
+.how-it-works .step-icon {
     font-size: 3rem;
     margin-bottom: 1.5rem;
     display: block;
     transition: transform 0.3s ease;
 }
 
-.step:hover .step-icon {
-    transform: scale(1.2);
+.how-it-works .step:hover .step-icon {
+    transform: scale(1.15) rotate(5deg);
 }
 
-.step-content h3 {
+.how-it-works .step-content h3 {
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 0.75rem;
@@ -875,22 +897,22 @@
     transition: color 0.3s;
 }
 
-.step:hover .step-content h3 {
+.how-it-works .step:hover .step-content h3 {
     color: var(--primary);
 }
 
-.step-content p {
+.how-it-works .step-content p {
     color: var(--text-secondary);
     line-height: 1.6;
     font-size: 0.95rem;
 }
 
 /* Hide old connectors */
-.step-connector {
+.how-it-works .step-connector {
     display: none;
 }
 
-.steps::before {
+.how-it-works .steps::before {
     display: none;
 }
 
@@ -1201,19 +1223,27 @@
         grid-template-columns: 1fr;
     }
 
-    .steps {
-        flex-direction: row;
+    .how-it-works .steps {
+        flex-direction: column;
         align-items: center;
-        gap: 2rem;
+        gap: 1.5rem;
+        position: relative;
     }
 
-    .step {
+    /* Vertical connecting line for mobile - hidden since we have card gaps */
+    .how-it-works .steps::before {
+        display: none;
+    }
+
+    .how-it-works .step {
         max-width: 350px;
+        width: 100%;
+        padding: 2rem 1.5rem;
     }
 
-    /* Hide connector lines on mobile */
-    .step:not(:last-child)::after,
-    .step:not(:last-child)::before {
+    /* Hide horizontal connector lines on mobile */
+    .how-it-works .step:not(:last-child)::after,
+    .how-it-works .step:not(:last-child)::before {
         display: none;
     }
 
