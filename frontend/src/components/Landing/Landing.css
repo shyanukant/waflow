@@ -716,42 +716,31 @@
 
 .steps {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
     gap: 0;
-    max-width: 700px;
+    max-width: 1100px;
     margin: 0 auto;
     position: relative;
 }
 
-/* Vertical connecting line in the middle */
-.steps::before {
-    content: '';
-    position: absolute;
-    left: 35px;
-    top: 35px;
-    bottom: 35px;
-    width: 3px;
-    background: linear-gradient(180deg, var(--primary) 0%, var(--border) 50%, var(--primary) 100%);
-    z-index: 1;
-}
-
-/* The step wrapper */
+/* The step wrapper for positioning connectors */
 .step {
-    display: flex;
-    align-items: flex-start;
-    gap: 2rem;
-    padding: 1.5rem 0;
+    flex: 1;
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1.5rem;
     background: transparent;
     border: none;
     position: relative;
     transition: all 0.3s ease;
 }
 
-/* Node circle */
+/* Node circle - the main number circle */
 .step-number {
     width: 70px;
     height: 70px;
-    min-width: 70px;
     background: var(--bg-card);
     border: 3px solid var(--primary);
     color: var(--primary);
@@ -761,10 +750,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 auto 1.5rem;
     position: relative;
     z-index: 2;
     transition: all 0.4s ease;
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+    box-shadow: 0 0 0 0 var(--glow);
 }
 
 /* Pulse ring animation on node */
@@ -791,41 +781,96 @@
     }
 }
 
+/* Connector line between nodes */
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 35px;
+    left: calc(50% + 45px);
+    width: calc(100% - 90px);
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--border) 50%, var(--primary) 100%);
+    background-size: 200% 100%;
+    z-index: 1;
+    transition: all 0.4s ease;
+}
+
+/* Animated dot traveling on the line */
+.step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 32px;
+    left: calc(50% + 45px);
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 50%;
+    z-index: 3;
+    opacity: 0;
+    box-shadow: 0 0 15px var(--primary);
+    transition: opacity 0.3s;
+}
+
 /* Hover effects on step */
 .step:hover .step-number {
     background: var(--primary);
     color: #000;
     transform: scale(1.1);
-    box-shadow: 0 0 40px var(--glow);
+    box-shadow: 0 0 30px var(--glow);
 }
 
 .step:hover .step-number::before {
     animation: none;
 }
 
-/* Step icon */
+/* Animate connector on hover */
+.step:hover:not(:last-child)::after {
+    background-position: -100% 0;
+    animation: flow-line 1s linear infinite;
+}
+
+.step:hover:not(:last-child)::before {
+    opacity: 1;
+    animation: travel-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes flow-line {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes travel-dot {
+    0% {
+        left: calc(50% + 45px);
+        opacity: 1;
+    }
+
+    100% {
+        left: calc(100% + 35px);
+        opacity: 0;
+    }
+}
+
 .step-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.75rem;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
     display: block;
     transition: transform 0.3s ease;
 }
 
 .step:hover .step-icon {
-    transform: scale(1.15);
-}
-
-/* Step content - aligned to the right of the number */
-.step-content {
-    flex: 1;
-    text-align: left;
-    padding-top: 0.5rem;
+    transform: scale(1.2);
 }
 
 .step-content h3 {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     color: var(--text-primary);
     transition: color 0.3s;
 }
@@ -837,7 +882,7 @@
 .step-content p {
     color: var(--text-secondary);
     line-height: 1.6;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 /* Hide old connectors */
@@ -845,8 +890,7 @@
     display: none;
 }
 
-.step:not(:last-child)::after,
-.step:not(:last-child)::before {
+.steps::before {
     display: none;
 }
 
@@ -1158,7 +1202,7 @@
     }
 
     .steps {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         gap: 2rem;
     }
