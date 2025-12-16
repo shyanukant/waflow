@@ -26,9 +26,9 @@ function VerifyEmail() {
                 setStatus('success');
                 setMessage('Email verified successfully! Redirecting to setup...');
 
-                // Redirect to onboarding after 2 seconds
+                // Force full page reload to re-check auth state
                 setTimeout(() => {
-                    navigate('/onboarding');
+                    window.location.href = '/onboarding';
                 }, 2000);
             } catch (error: any) {
                 console.error('Verification error:', error);

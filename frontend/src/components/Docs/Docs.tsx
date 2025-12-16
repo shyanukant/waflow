@@ -265,7 +265,7 @@ function Docs() {
 
                         <div className="github-link">
                             <p>Want more templates? Check out our</p>
-                            <a href="https://github.com/yourusername/waflow/wiki" target="_blank" rel="noopener noreferrer">
+                            <a href="https://github.com/shyanukant/waflow/wiki" target="_blank" rel="noopener noreferrer">
                                 📖 Full Documentation on GitHub Wiki →
                             </a>
                         </div>
